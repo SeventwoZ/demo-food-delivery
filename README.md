@@ -1,34 +1,53 @@
-# 🍽️ Demo Food Delivery
+A full-stack role-playing web application that simulates restaurant design and management workflows.
 
-A role-playing web application that simulates restaurant design and management processes. Users can explore menu items, create orders, and interact with a restaurant environment, while administrators can manage menus, customers, and order operations through a dedicated dashboard.
+Users can explore menu items, create orders, and interact with a restaurant ordering system, while administrators can manage menus, users, and order operations through an interactive dashboard.
 
 ## 🚀 Live Demo
 
 🔗 https://fooddelivery-peach.vercel.app
 
+---
+
 ## 🛠️ Tech Stack
 
-**Frontend**
-- React
+### Frontend
+- React.js
 - Tailwind CSS
 - Axios
+- React Router
 
-**Backend**
+### Backend
 - Node.js
 - Express.js
 - MongoDB
+- Mongoose
 - JWT Authentication
+- Multer (Image Upload)
+
+---
 
 ## ✨ Features
 
-- Browse food menu
+### 👤 Customer Side
+
+- Browse restaurant menu
 - View food details
-- Shopping cart
+- Add items to shopping cart
+- Create and manage orders
 - User authentication
-- Admin dashboard
+- Responsive user interface
+
+### 🧑‍💼 Admin Dashboard
+
+- Dashboard overview
 - Menu management (CRUD)
+- Add, update, and delete menu items
+- Upload and manage food images
 - Order management
-- Responsive design
+- Order status tracking
+- User management
+
+---
 
 ## 📁 Project Structure
 
