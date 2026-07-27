@@ -1,6 +1,6 @@
 # 🍽️ Demo Food Delivery
 
-A full-stack food ordering web application built with React, Node.js, Express, and MongoDB. The project features a responsive customer interface and an admin dashboard for managing menus and orders.
+A role-playing web application that simulates restaurant design and management processes. Users can explore menu items, create orders, and interact with a restaurant environment, while administrators can manage menus, customers, and order operations through a dedicated dashboard.
 
 ## 🚀 Live Demo
 
