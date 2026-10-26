@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import '../../../css/fonts.css';
 
@@ -7,8 +7,6 @@ const API_URL = process.env.REACT_APP_API_URL;
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('menu');
   const [menu, setMenu] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [orders, setOrders] = useState([]);
   const [tableOrders, setTableOrders] = useState({});
   const [selectedTable, setSelectedTable] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,9 +38,9 @@ const Dashboard = () => {
   const [completionCountdown, setCompletionCountdown] = useState(60);
   const [pendingCompletion, setPendingCompletion] = useState(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
-      const [menuRes, usersRes, ordersRes] = await Promise.all([
+      const [menuRes] = await Promise.all([
         axios.get(`${API_URL}/api/menu`),
         axios.get(`${API_URL}/api/users`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -52,14 +50,12 @@ const Dashboard = () => {
         })
       ]);
       setMenu(menuRes.data);
-      setUsers(usersRes.data);
-      setOrders(ordersRes.data);
     } catch (err) {
       setMessage('Failed to fetch data.');
     }
-  };
+  }, [token]);
 
-  const fetchTableOrder = async (tableId) => {
+  const fetchTableOrder = useCallback(async (tableId) => {
     try {
       const response = await axios.get(`${API_URL}/api/orders/${tableId}`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -80,7 +76,7 @@ const Dashboard = () => {
         console.error('Error fetching table order:', err);
       }
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     if (!token) return;
@@ -95,7 +91,7 @@ const Dashboard = () => {
     }, 5000); // Poll every 5 seconds
 
     return () => clearInterval(interval);
-  }, [token]);
+  }, [token, fetchData, fetchTableOrder]);
 
   useEffect(() => {
     setMessage('');
@@ -191,38 +187,6 @@ const Dashboard = () => {
     setCustomCategory('');
   };
 
-  const startCompletionProcess = async (tableId) => {
-    try {
-      // First update status to notify mobile app
-      await axios.put(`${API_URL}/api/orders/${tableId}/status`, 
-        { status: 'เสร็จสิ้น' },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      
-      // Set pending completion and start countdown
-      setPendingCompletion(tableId);
-      setIsCompletionModalOpen(true);
-      setCompletionCountdown(60);
-      
-      // Start countdown
-      const timer = setInterval(() => {
-        setCompletionCountdown(prev => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      // Store timer ID for cleanup
-      return timer;
-    } catch (err) {
-      console.error('Error starting completion process:', err);
-      setMessage('เกิดข้อผิดพลาดในการอัพเดทสถานะ');
-    }
-  };
-
   const confirmCompletion = async () => {
     if (!pendingCompletion) return;
     
@@ -243,39 +207,6 @@ const Dashboard = () => {
       setCompletionCountdown(60);
     } catch (err) {
       console.error('Error completing order:', err);
-      setMessage('เกิดข้อผิดพลาดในการลบออเดอร์');
-    }
-  };
-
-  const handleDeleteOrder = async (tableId) => {
-    try {
-      // First check if the order exists and is completed
-      const order = tableOrders[tableId];
-      if (!order) {
-        setMessage('ไม่พบออเดอร์นี้');
-        return;
-      }
-
-      if (order.status !== 'เสร็จสิ้น') {
-        setMessage('สามารถลบได้เฉพาะออเดอร์ที่เสร็จสิ้นแล้วเท่านั้น');
-        return;
-      }
-
-      // If order exists and is completed, proceed with deletion
-      await axios.delete(`${API_URL}/api/orders/${tableId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      // Remove the order from state
-      setTableOrders(prev => {
-        const newState = { ...prev };
-        delete newState[tableId];
-        return newState;
-      });
-
-      setMessage('ลบออเดอร์เรียบร้อยแล้ว');
-    } catch (err) {
-      console.error('Error deleting order:', err);
       setMessage('เกิดข้อผิดพลาดในการลบออเดอร์');
     }
   };
